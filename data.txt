@@ -1,0 +1,194 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema Hotel
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema Hotel
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `Hotel` ;
+USE `Hotel` ;
+
+-- -----------------------------------------------------
+-- Table `Hotel`.`Room Type`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Hotel`.`Room Type` (
+  `RoomType` VARCHAR(45) NOT NULL,
+  `RoomPrice` DECIMAL(10,2) NULL,
+  `RoomDesc` VARCHAR(1000) NULL,
+  PRIMARY KEY (`RoomType`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Hotel`.`Hotel`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Hotel`.`Hotel` (
+  `HotelID` INT(13) NOT NULL,
+  `HotelName` VARCHAR(100) NULL,
+  `Address` VARCHAR(200) NULL,
+  `Postcode` INT(5) NULL,
+  `City` VARCHAR(45) NULL,
+  `Country` VARCHAR(45) NULL,
+  `NumRooms` INT(10) NULL,
+  `Phone` VARCHAR(45) NULL,
+  `StarRating` INT(5) NULL,
+  PRIMARY KEY (`HotelID`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Hotel`.`Room`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Hotel`.`Room` (
+  `RoomNo` INT(10) NOT NULL,
+  `RoomType` VARCHAR(45) NOT NULL,
+  `HotelID` INT(13) NOT NULL,
+  PRIMARY KEY (`RoomNo`),
+  INDEX `fk_Room_Room Type_idx` (`RoomType` ASC) VISIBLE,
+  INDEX `fk_Room_Hotel1_idx` (`HotelID` ASC) VISIBLE,
+  CONSTRAINT `fk_Room_Room Type`
+    FOREIGN KEY (`RoomType`)
+    REFERENCES `Hotel`.`Room Type` (`RoomType`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Room_Hotel1`
+    FOREIGN KEY (`HotelID`)
+    REFERENCES `Hotel`.`Hotel` (`HotelID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Hotel`.`Guest`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Hotel`.`Guest` (
+  `GuestID` INT(13) NOT NULL,
+  `Firstname` VARCHAR(45) NULL,
+  `Lastname` VARCHAR(45) NULL,
+  `DOB` DATETIME NULL,
+  `Gender` VARCHAR(30) NULL,
+  `Phone` INT(13) NULL,
+  `Email` VARCHAR(45) NULL,
+  `Address` VARCHAR(200) NULL,
+  `Postcode` INT(5) NULL,
+  `City` VARCHAR(45) NULL,
+  `Country` VARCHAR(45) NULL,
+  PRIMARY KEY (`GuestID`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Hotel`.`Booking`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Hotel`.`Booking` (
+  `BookingID` INT(13) NOT NULL,
+  `BookingDate` DATETIME NULL,
+  `BookingTime` VARCHAR(30) NULL,
+  `DateArrival` DATETIME NULL,
+  `DateDeparture` DATETIME NULL,
+  `DateCheckIn` VARCHAR(30) NULL,
+  `DateCheckOut` VARCHAR(30) NULL,
+  `NumGuest` INT(2) NULL,
+  `MessageToBooking` VARCHAR(1000) NULL,
+  `RoomNo` INT(10) NOT NULL,
+  `HotelID` INT(13) NOT NULL,
+  `GuestID` INT(13) NOT NULL,
+  PRIMARY KEY (`BookingID`),
+  INDEX `fk_Booking_Room1_idx` (`RoomNo` ASC) VISIBLE,
+  INDEX `fk_Booking_Hotel1_idx` (`HotelID` ASC) VISIBLE,
+  INDEX `fk_Booking_Guest1_idx` (`GuestID` ASC) VISIBLE,
+  CONSTRAINT `fk_Booking_Room1`
+    FOREIGN KEY (`RoomNo`)
+    REFERENCES `Hotel`.`Room` (`RoomNo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Booking_Hotel1`
+    FOREIGN KEY (`HotelID`)
+    REFERENCES `Hotel`.`Hotel` (`HotelID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Booking_Guest1`
+    FOREIGN KEY (`GuestID`)
+    REFERENCES `Hotel`.`Guest` (`GuestID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Hotel`.`Bill`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Hotel`.`Bill` (
+  `InvoiceNum` INT(13) NOT NULL,
+  `RoomCharge` DECIMAL(10,2) NULL,
+  `PaymentDate` DATETIME NULL,
+  `PaymentTime` VARCHAR(30) NULL,
+  `BookingID` INT(13) NOT NULL,
+  `GuestID` INT(13) NOT NULL,
+  PRIMARY KEY (`InvoiceNum`),
+  INDEX `fk_Bill_Booking1_idx` (`BookingID` ASC) VISIBLE,
+  INDEX `fk_Bill_Guest1_idx` (`GuestID` ASC) VISIBLE,
+  CONSTRAINT `fk_Bill_Booking1`
+    FOREIGN KEY (`BookingID`)
+    REFERENCES `Hotel`.`Booking` (`BookingID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Bill_Guest1`
+    FOREIGN KEY (`GuestID`)
+    REFERENCES `Hotel`.`Guest` (`GuestID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Hotel`.`Employee`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Hotel`.`Employee` (
+  `EmploeeID` INT(13) NOT NULL,
+  `Firstname` VARCHAR(45) NULL,
+  `Lastname` VARCHAR(45) NULL,
+  `DOB` DATETIME NULL,
+  `Gender` VARCHAR(30) NULL,
+  `Phone` INT(13) NULL,
+  `Email` VARCHAR(45) NULL,
+  `Salary` DECIMAL(10,2) NULL,
+  `HotelID` INT(13) NOT NULL,
+  PRIMARY KEY (`EmploeeID`),
+  INDEX `fk_Employee_Hotel1_idx` (`HotelID` ASC) VISIBLE,
+  CONSTRAINT `fk_Employee_Hotel1`
+    FOREIGN KEY (`HotelID`)
+    REFERENCES `Hotel`.`Hotel` (`HotelID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Hotel`.`Role`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Hotel`.`Role` (
+  `RoleID` INT(10) NOT NULL,
+  `RoleTitle` VARCHAR(45) NULL,
+  `RoleDesc` VARCHAR(1000) NULL,
+  `EmploeeID` INT(13) NOT NULL,
+  PRIMARY KEY (`RoleID`),
+  INDEX `fk_Role_Employee1_idx` (`EmploeeID` ASC) VISIBLE,
+  CONSTRAINT `fk_Role_Employee1`
+    FOREIGN KEY (`EmploeeID`)
+    REFERENCES `Hotel`.`Employee` (`EmploeeID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
